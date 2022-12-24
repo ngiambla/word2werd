@@ -1,28 +1,41 @@
 
 var LegalWordSet;
-var WordSize;
+var LegalWordDict;
 var Word;
+var IllegalWordCount=0;
+const Submissions = new Set();
+const WordCharSet = new Set();
 
 function getRandomInt(max) {
     return Math.floor(Math.random() * max);
 }
 
-function getRandomItem(theset) {
+function getRandomWord(theset) {
     const array = [];
     theset.forEach(v => array.push(v));
     return array[Math.floor(Math.random() * array.length)];
 }
 
 $( window ).on("load", function() {
-
-
-    $.get('words.txt', function(data) {
+    $.get('data/words.txt', function(data) {
         LegalWordSet = new Set(data.split(/\r?\n/));
-        console.log(LegalWordSet);
-        Word = getRandomItem(LegalWordSet);
+    });
+
+    $.getJSON("data/word-freq.json", function( data ) {
+        // Create a dictionary here.
+        LegalWordDict = {}
+
+        $.each( data, function(theword, val ) {
+            LegalWordDict[theword] = val;
+        });
+
+        Word = getRandomWord(Object.keys(LegalWordDict));
+        while(Word.length > 7)
+            Word = getRandomWord(Object.keys(LegalWordDict));
+
         NewWord = Word;
-        WordSize = Word.length;
         for (var i = 0; i < Word.length; i++) {
+            WordCharSet.add(Word.charAt(i));
             Input = jQuery("<input id=\"l"+i.toString()+"\" value=\""+Word.charAt(i)+"\"style=\"font-size:20px; font-weight: bold; margin-right: 10px; width: 4ch; height: 4ch; text-align: center; float:left;\" type=\"text\" />");
             $("#reference").append(Input)
             $("#l"+i.toString()).prop('disabled', true);
@@ -33,6 +46,7 @@ $( window ).on("load", function() {
             $("#user_inp").append(Input)
         }
 
+        // Autotab to next input.
         $(".inputs").keyup(function () {
             if (this.value.length == this.maxLength) {
               var $next = $(this).next('.inputs');
@@ -42,19 +56,41 @@ $( window ).on("load", function() {
                   $(this).blur();
             }
         });
-
-    }, 'text');    
-
+    });
 });
 
 function validate() {
-    var UserWord = "";
-    for (var i = 0; i < WordSize; i++) {
-        UserWord += $("#i"+i.toString()).val();
-    }
-    console.log(UserWord);
 
-    if(LegalWordSet.has(UserWord)) {
-        console.log("Success!");
+    var UserWord = "";
+    var NewChars = 0;
+    for (var i = 0; i < Word.length; i++) {
+        UserChar = $("#i"+i.toString()).val();
+        if (!WordCharSet.has(UserChar))
+            NewChars+=1;  
+        UserWord += UserChar;
+    }
+
+    console.log(UserWord);
+    if (UserWord in LegalWordDict || LegalWordSet.has(UserWord)) {
+        var Freq = 7;
+        if (UserWord in LegalWordDict) {
+            Freq = LegalWordDict[UserWord]
+        }
+        var Score = Freq*10
+        if (IllegalWordCount > 0) {
+            Score *= (1.0/(2*IllegalWordCount));
+        }
+        if (NewChars > 0) {
+            Score *= (1.0/(4*NewChars));
+        }
+
+        $('#score').text(Score);
+        Submissions.add(UserWord)
+    } else {
+        if (!Submissions.has(UserWord)) {
+            IllegalWordCount+=1;
+            $('#attempts').text(IllegalWordCount);
+            Submissions.add(UserWord)
+        }
     }
 }

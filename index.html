@@ -20,6 +20,28 @@
 
 <body>
     <div class="container">
+        <h1>Word2<code>Werd</code></h1>
+        <blockquote>
+            <p><em>If you replace the % and # in **%*#** with ^ and >, then you can form a new word, **^*>**</em></p>
+        </blockquote>
+        <p> If this sounds like something you've encountered before, now there's a game with for it.
+            Here are the rules:
+            <ol>
+                <li>You are provided with a word of N-Characters</li>
+                <li>You are to form a new word of the same size</li>
+                <li>You can use any characters of the English alphabet to form the new word</li>
+                <li>The new word cannot be the provided word! </li>
+            </ol>
+            <em>Scoring:</em>
+            <ul>
+                <li>Less frequently used words provide a higher score (i.e., grapple is higher in value than through)<sup>1</sup> </li>
+                <li>Every <em>new</em> character in the new word quarters your score</li>
+                <li>An invalid word (i.e., a word that doesn't actually exist) halves your score (once you have a successful submission)</li>
+            </ul>
+        </p>
+
+
+
         <div class="row">
             <div id="reference"  class="column">
 
@@ -31,8 +53,17 @@
             </div>
         </div>   
         <div class="row">
+            <div id="stats"  class="column">
+                <h1>Score: <em id="score"> 0 </em></h1>
+                <h1>Attempts: <em id="attempts">0</em></h1>
+            </div>
+        </div>
+        <div class="row">
             <a onclick="validate()" id="check_resp" class="button">Submit.</a>
         </div>
       </div>
+      <blockquote>
+        <sup>1</sup> Frequency taken from Google's N-Grams
+    </blockquote>      
 </body>
 </html>
