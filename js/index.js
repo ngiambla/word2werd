@@ -34,12 +34,12 @@ $( window ).on("load", function() {
         }
 
         for (var i = 0; i < NewWord.length; ++i) {
-            Input = jQuery("<input class=\"inputs\" maxlength=\"1\" id=\"i"+i.toString()+"\" placeholder=\""+Word.charAt(i)+"\"style=\"font-size:20px; font-weight: bold; margin-right: 10px; width: 4ch; height: 4ch; text-align: center; float:left;\" type=\"text\" />");
+            Input = jQuery("<input autocorrect=\"off\" autocapitalize=\"none\" class=\"inputs\" maxlength=\"1\" id=\"i"+i.toString()+"\" placeholder=\""+Word.charAt(i)+"\"style=\"font-size:20px; font-weight: bold; margin-right: 10px; width: 4ch; height: 4ch; text-align: center; float:left;\" type=\"text\" />");
             $("#user_inp").append(Input)
         }
         $( ".inputs" ).keydown(function( event ) {
             if (event.keyCode >= 65 && event.keyCode <= 90) {
-                $(this).val(event.key);
+                $(this).val(event.key.toLowerCase());
             }
             if (event.keyCode == 8) {
                 $(this).val('');
