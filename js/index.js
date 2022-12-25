@@ -72,7 +72,7 @@ function validate() {
     }
 
     if (LegalWordSet.has(UserWord) && UserWord != Word) {
-        $.post("http://word2werd.pythonanywhere.com/get_word_freq", {"word": UserWord, "attempts" : IllegalWordCount, "newchars" : NewChars}, function(Resp) {
+        $.post("https://word2werd.pythonanywhere.com/get_word_freq", {"word": UserWord, "attempts" : IllegalWordCount, "newchars" : NewChars}, function(Resp) {
             var Score = Resp["score"]
             $('#score').text(Score.toFixed(3));
             $('#hiscore').text(Resp["hiscore"].toFixed(3));
