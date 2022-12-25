@@ -1,6 +1,5 @@
 
 var LegalWordSet;
-var LegalWordDict;
 var Word;
 var IllegalWordCount=0;
 const Submissions = new Set();
@@ -19,20 +18,13 @@ function getRandomWord(theset) {
 $( window ).on("load", function() {
     $.get('data/words.txt', function(data) {
         LegalWordSet = new Set(data.split(/\r?\n/));
-    });
-
-    $.getJSON("data/word-freq.json", function( data ) {
-        // Create a dictionary here.
-        LegalWordDict = {}
-
-        $.each( data, function(theword, val ) {
-            LegalWordDict[theword] = val;
-        });
-
-        Word = getRandomWord(Object.keys(LegalWordDict));
-        while(Word.length > 7)
-            Word = getRandomWord(Object.keys(LegalWordDict));
-
+        Word = getRandomWord(LegalWordSet);
+        var ValidWordLength = false;
+        while(!ValidWordLength) {
+            Word = getRandomWord(LegalWordSet);
+            if (Word.length > 4 && Word.length < 8)
+                ValidWordLength = true;
+        }
         NewWord = Word;
         for (var i = 0; i < Word.length; i++) {
             WordCharSet.add(Word.charAt(i));
@@ -45,6 +37,15 @@ $( window ).on("load", function() {
             Input = jQuery("<input class=\"inputs\" maxlength=\"1\" id=\"i"+i.toString()+"\" placeholder=\""+Word.charAt(i)+"\"style=\"font-size:20px; font-weight: bold; margin-right: 10px; width: 4ch; height: 4ch; text-align: center; float:left;\" type=\"text\" />");
             $("#user_inp").append(Input)
         }
+        $( ".inputs" ).keydown(function( event ) {
+            if (event.keyCode >= 65 && event.keyCode <= 90) {
+                $(this).val(event.key);
+            }
+            if (event.keyCode == 8) {
+                $(this).val('');
+                $(this).prev('.inputs').focus();
+            }
+        });
 
         // Autotab to next input.
         $(".inputs").keyup(function () {
@@ -55,7 +56,7 @@ $( window ).on("load", function() {
               else
                   $(this).blur();
             }
-        });
+        });        
     });
 });
 
@@ -70,22 +71,16 @@ function validate() {
         UserWord += UserChar;
     }
 
-    console.log(UserWord);
-    if (UserWord in LegalWordDict || LegalWordSet.has(UserWord)) {
-        var Freq = 7;
-        if (UserWord in LegalWordDict) {
-            Freq = LegalWordDict[UserWord]
-        }
-        var Score = Freq*10
-        if (IllegalWordCount > 0) {
-            Score *= (1.0/(2*IllegalWordCount));
-        }
-        if (NewChars > 0) {
-            Score *= (1.0/(4*NewChars));
-        }
-
-        $('#score').text(Score);
-        Submissions.add(UserWord)
+    if (LegalWordSet.has(UserWord) && UserWord != Word) {
+        $.post("http://word2werd.pythonanywhere.com/get_word_freq", {"word": UserWord, "attempts" : IllegalWordCount, "newchars" : NewChars}, function(Resp) {
+            var Score = Resp["score"]
+            $('#score').text(Score.toFixed(3));
+            $('#hiscore').text(Resp["hiscore"].toFixed(3));
+            $('#hiscore-wrap').show();
+            Submissions.add(UserWord)
+        }).fail(function() {
+            console.log("Error: POST failed. Contact nicholas.giamblanco@gmail.com");
+        }); 
     } else {
         if (!Submissions.has(UserWord)) {
             IllegalWordCount+=1;
