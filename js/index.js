@@ -191,6 +191,20 @@ function validate() {
                 if (Submissions.size < 3) {
                     CreateNewInput(Submissions.size);
                 }
+            } else {
+                ClearInput(Submissions.size);
+                Toastify({
+                    text: UserWord+" is not a valid word!",
+                    duration: 2000,
+                    close: true,
+                    gravity: "top", // `top` or `bottom`
+                    position: "center", // `left`, `center` or `right`
+                    stopOnFocus: true, // Prevents dismissing of toast on hover
+                    style: {
+                      background: "linear-gradient(to right, #00b09b, #96c93d)",
+                    },
+                    onClick: function(){} // Callback after click
+                  }).showToast();                
             }
 
         }).fail(function() {
