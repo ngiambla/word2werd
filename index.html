@@ -11,11 +11,17 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css">
     <!-- Milligram CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.css">
+    <!-- Toastify -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+
 
 <!-- Javascript Includes -->
     <!-- JQuery -->
     <script src="https://code.jquery.com/jquery-3.6.3.min.js" integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU=" crossorigin="anonymous"></script>
+    <!-- Toastify -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>    
     <script type="text/javascript" src="js/index.js"></script>
+
 </head>
 
 <body>
@@ -31,36 +37,30 @@
                 <li>You are to form a new word of the same size</li>
                 <li>You can use any characters of the English alphabet to form the new word</li>
                 <li>The new word cannot be the provided word! </li>
+                <li>You get three trys per day! </li>
             </ol>
             <em>Scoring:</em>
             <ul>
                 <li>Less frequently used words provide a higher score (i.e., grapple is higher in value than through)<sup>1</sup> </li>
-                <li>Every <em>new</em> character in the new word quarters your score</li>
-                <li>An invalid word (i.e., a word that doesn't actually exist) halves your score (once you have a successful submission)</li>
+                <li>Every <em>new</em> character in the new word halves your score</li>
             </ul>
         </p>
-
-
 
         <div class="row">
             <div id="reference"  class="column">
 
             </div>
         </div>
+        <div id ="submit-row"  class="row">
+            <a onclick="validate()" id="check_resp" class="button">Submit.</a>
+        </div>
         <div class="row">
-            <div id="user_inp"  class="column">
-
-            </div>
-        </div>   
-        <div class="row">
-            <div id="stats"  class="column">
-                <h1>Score: <em id="score"> 0 </em></h1>
-                <h1>Attempts: <em id="attempts">0</em></h1>
-                <h1 id="hiscore-wrap" style="display: none;">Today's Hi-Score: <em id="hiscore">0</em></h1>
+            <div id="stats"  class="column column-33">
+                <h2 id="hiscore-wrap" style="display: none;">Current Hi-Score: <em id="hiscore">0</em></h2>
             </div>
         </div>
         <div class="row">
-            <a onclick="validate()" id="check_resp" class="button">Submit.</a>
+            <div id="hiscore-def" class="column column-50" style="display: none;"></div>
         </div>
       </div>
       <blockquote>

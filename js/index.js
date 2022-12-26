@@ -1,62 +1,140 @@
 
-var LegalWordSet;
 var Word;
-var IllegalWordCount=0;
 const Submissions = new Set();
 const WordCharSet = new Set();
 
-function getRandomInt(max) {
-    return Math.floor(Math.random() * max);
+function DisableInput(InputIDNum) {
+    for (var i = 0; i < Word.length; i++) {
+        $("#i"+InputIDNum.toString()+i.toString()).prop('disabled', true);
+    }
 }
 
-function getRandomWord(theset) {
-    const array = [];
-    theset.forEach(v => array.push(v));
-    return array[Math.floor(Math.random() * array.length)];
+function AnimateInput(InputIDNum) {
+    for (var i = 0; i < Word.length; i++) {
+        $("#i"+InputIDNum.toString()+i.toString()).css("background-color", 'rgb(155, 77, 202, 0.45)');
+    }
+}
+
+function ClearInput(InputIDNum) {
+    for (var i = 0; i < Word.length; i++) {
+        $("#i"+InputIDNum.toString()+i.toString()).val('');
+    }
+}
+
+function SetInput(InputIDNum, UserWord) {
+    for (var i = 0; i < Word.length; i++) {
+        $("#i"+InputIDNum.toString()+i.toString()).val(UserWord.charAt(i));
+    }
+}
+
+function TagScore(InputIDNum, Score, HiScore) { 
+    var Input = jQuery("<h2>Score: <em id=\"score\"> "+ Score.toFixed(2) +" </em></h2>");
+    $("#user_inp_"+InputIDNum.toString()).append(Input);
+    if (HiScore !== null) {
+        $('#hiscore').text(HiScore.toFixed(2));
+        $('#hiscore-wrap').show();
+    }
+}
+
+function CreateNewInput(InputIDNum) {
+    var InputID = InputIDNum.toString();
+    $("<div id=\"subrow"+InputID+"\"class=\"row\"></div>").insertBefore("#submit-row");
+
+    var InputWrap = jQuery("<div id=\"user_inp_"+InputID+"\" class=\"column\"></div>");
+    $("#subrow"+InputID).append(InputWrap);
+    for (var i = 0; i < Word.length; ++i) {
+        var Input = jQuery("<input autocorrect=\"off\" autocapitalize=\"none\" class=\"inputs\" maxlength=\"1\" id=\"i"+InputID+i.toString()+"\" placeholder=\""+Word.charAt(i)+"\"style=\"font-size:20px; font-weight: bold; margin-right: 10px; width: 4ch; height: 4ch; text-align: center; float:left;\" type=\"text\" />");
+        $("#user_inp_"+InputID).append(Input);
+    }
+    
+    $(".inputs").keydown(function( event ) {
+        if (event.keyCode >= 65 && event.keyCode <= 90) {
+            $(this).val(event.key.toLowerCase());
+        }
+        if (event.keyCode == 8) {
+            $(this).val('');
+            $(this).prev('.inputs').focus();
+        }
+    });
+
+    // Autotab to next input.
+    $(".inputs").keyup(function () {
+        if (this.value.length == this.maxLength) {
+          var $next = $(this).next('.inputs');
+          if ($next.length)
+              $(this).next('.inputs').focus();
+          else
+              $(this).blur();
+        }
+    });     
+}
+
+function getHiScore() {
+    $.post("https://word2werd.pythonanywhere.com/get_current_topscoring_word", {}, function(Resp) {
+        if (Resp["valid"]) {
+            var HiScore = Resp["hiscore"]
+            $('#hiscore').text(HiScore.toFixed(2));
+            $('#hiscore-wrap').show();
+            if(Submissions.size > 2 && $("#word-def").val() != Resp["word"]) {
+                $("#hiscore-def").hide();
+                $("#hiscore-def").empty();
+                var Word = jQuery("<h1 id=\"word-def\">Best Scoring Word: <em>"+Resp["word"]+"</em></h1>");
+
+                $("#hiscore-def").append(Word);
+                var Definition = Resp["word"];
+                for (const Prop in Resp["definition"]) {
+                    for (const Def in Resp["definition"][Prop]) {
+                        var DefP = jQuery("<p><em>"+Prop+"</em>: "+Resp["definition"][Prop][Def]+"</p>");
+                        $("#hiscore-def").append(DefP);
+                    }
+                }
+                $("#hiscore-def").show();
+            }
+        }
+
+    }).done(function(){
+        setTimeout(getHiScore, 2000);
+    }).fail(function() {
+        console.log("Error: POST failed. Contact nicholas.giamblanco@gmail.com");
+    });    
 }
 
 $( window ).on("load", function() {
-    $.get('data/words.txt', function(data) {
-        LegalWordSet = new Set(data.split(/\r?\n/));
-        Word = getRandomWord(LegalWordSet);
-        var ValidWordLength = false;
-        while(!ValidWordLength) {
-            Word = getRandomWord(LegalWordSet);
-            if (Word.length > 4 && Word.length < 8)
-                ValidWordLength = true;
-        }
-        NewWord = Word;
+    getHiScore();
+    $.post("https://word2werd.pythonanywhere.com/get_word_of_the_day", {}, function(Resp) {
+        Word = Resp["word-of-the-day"]
+
         for (var i = 0; i < Word.length; i++) {
             WordCharSet.add(Word.charAt(i));
-            Input = jQuery("<input id=\"l"+i.toString()+"\" value=\""+Word.charAt(i)+"\"style=\"font-size:20px; font-weight: bold; margin-right: 10px; width: 4ch; height: 4ch; text-align: center; float:left;\" type=\"text\" />");
+            var Input = jQuery("<input id=\"l"+i.toString()+"\" value=\""+Word.charAt(i)+"\"style=\"font-size:20px; font-weight: bold; margin-right: 10px; width: 4ch; height: 4ch; text-align: center; float:left;\" type=\"text\" />");
             $("#reference").append(Input)
             $("#l"+i.toString()).prop('disabled', true);
         }
+        if (localStorage.getItem("WordOfDay") != Word) {
+            localStorage.clear();
+            localStorage.setItem('WordOfDay', Word);
+        } else {
+            // Rebuild from Local Storage.
+            if (localStorage.getItem("NumSubmissions") !== null) {
+                var NumSubmissions = parseInt(localStorage.getItem("NumSubmissions"));
 
-        for (var i = 0; i < NewWord.length; ++i) {
-            Input = jQuery("<input autocorrect=\"off\" autocapitalize=\"none\" class=\"inputs\" maxlength=\"1\" id=\"i"+i.toString()+"\" placeholder=\""+Word.charAt(i)+"\"style=\"font-size:20px; font-weight: bold; margin-right: 10px; width: 4ch; height: 4ch; text-align: center; float:left;\" type=\"text\" />");
-            $("#user_inp").append(Input)
+                for(var i = 0; i < NumSubmissions; ++i) {
+                    var Score = parseFloat(localStorage.getItem("Score"+i.toString()));
+                    var UserWord = localStorage.getItem("Submission"+i.toString());
+                    CreateNewInput(i);
+                    SetInput(i, UserWord)
+                    TagScore(i, Score, null);
+                    DisableInput(i);
+                    AnimateInput(i);
+                    Submissions.add(UserWord);
+                }
+            }
         }
-        $( ".inputs" ).keydown(function( event ) {
-            if (event.keyCode >= 65 && event.keyCode <= 90) {
-                $(this).val(event.key.toLowerCase());
-            }
-            if (event.keyCode == 8) {
-                $(this).val('');
-                $(this).prev('.inputs').focus();
-            }
-        });
-
-        // Autotab to next input.
-        $(".inputs").keyup(function () {
-            if (this.value.length == this.maxLength) {
-              var $next = $(this).next('.inputs');
-              if ($next.length)
-                  $(this).next('.inputs').focus();
-              else
-                  $(this).blur();
-            }
-        });        
+        if (Submissions.size < 3) {
+            CreateNewInput(Submissions.size);
+        }
+    }).fail(function() {
+        console.log("Error: POST failed. Contact nicholas.giamblanco@gmail.com");
     });
 });
 
@@ -64,28 +142,77 @@ function validate() {
 
     var UserWord = "";
     var NewChars = 0;
+    var SubID = Submissions.size.toString()
     for (var i = 0; i < Word.length; i++) {
-        UserChar = $("#i"+i.toString()).val();
+        UserChar = $("#i"+SubID+i.toString()).val();
         if (!WordCharSet.has(UserChar))
-            NewChars+=1;  
+            NewChars+=1;
         UserWord += UserChar;
     }
+    
+    if (Submissions.size > 2) {
+        // TODO: Hit Max.
+        console.log("Here...");
+        Toastify({
+            text: "You've already submitted 3 words :O!",
+            duration: 2000,
+            close: true,
+            gravity: "top", // `top` or `bottom`
+            position: "center", // `left`, `center` or `right`
+            stopOnFocus: true, // Prevents dismissing of toast on hover
+            style: {
+              background: "linear-gradient(to right, #00b09b, #96c93d)",
+            },
+            onClick: function(){} // Callback after click
+          }).showToast();
+        return;
+    }
 
-    if (LegalWordSet.has(UserWord) && UserWord != Word) {
-        $.post("https://word2werd.pythonanywhere.com/get_word_freq", {"word": UserWord, "attempts" : IllegalWordCount, "newchars" : NewChars}, function(Resp) {
+    if (UserWord.length != Word.length) {
+        return;
+    }    
+
+    if (UserWord != Word && !Submissions.has(UserWord)) {
+        $.post("https://word2werd.pythonanywhere.com/get_word_freq", {"word": UserWord, "newchars" : NewChars}, function(Resp) {
             var Score = Resp["score"]
-            $('#score').text(Score.toFixed(3));
-            $('#hiscore').text(Resp["hiscore"].toFixed(3));
-            $('#hiscore-wrap').show();
-            Submissions.add(UserWord)
+            var HiScore = Resp["hiscore"]
+
+            if (Resp["valid"]) {
+
+                TagScore(Submissions.size, Score, HiScore);
+                DisableInput(Submissions.size);
+                AnimateInput(Submissions.size);
+                // Add this to storage.
+                localStorage.setItem('Submission'+Submissions.size.toString(), UserWord);
+                localStorage.setItem('Score'+Submissions.size.toString(), Score);
+                Submissions.add(UserWord);
+                localStorage.setItem('NumSubmissions', Submissions.size);
+
+                if (Submissions.size < 3) {
+                    CreateNewInput(Submissions.size);
+                }
+            }
+
         }).fail(function() {
             console.log("Error: POST failed. Contact nicholas.giamblanco@gmail.com");
         }); 
     } else {
-        if (!Submissions.has(UserWord)) {
-            IllegalWordCount+=1;
-            $('#attempts').text(IllegalWordCount);
-            Submissions.add(UserWord)
-        }
+        ClearInput(Submissions.size);
+        var Message = "You've already submitted this word!";
+        if (UserWord == Word) {
+            Message = "You cannot submit the word of the day!";
+        } 
+        Toastify({
+            text: Message,
+            duration: 2000,
+            close: true,
+            gravity: "top", // `top` or `bottom`
+            position: "center", // `left`, `center` or `right`
+            stopOnFocus: true, // Prevents dismissing of toast on hover
+            style: {
+              background: "linear-gradient(to right, #00b09b, #96c93d)",
+            },
+            onClick: function(){} // Callback after click
+          }).showToast();
     }
 }
