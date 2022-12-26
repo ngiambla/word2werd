@@ -11,7 +11,11 @@ function DisableInput(InputIDNum) {
 
 function AnimateInput(InputIDNum) {
     for (var i = 0; i < Word.length; i++) {
-        $("#i"+InputIDNum.toString()+i.toString()).css("background-color", 'rgb(155, 77, 202, 0.45)');
+        if (!WordCharSet.has($("#i"+InputIDNum.toString()+i.toString()).val())) {
+            $("#i"+InputIDNum.toString()+i.toString()).css("background-color", 'rgb(239, 203, 104, 0.35)');
+        } else {
+            $("#i"+InputIDNum.toString()+i.toString()).css("background-color", 'rgb(112, 169, 161, 0.35)');
+        }
     }
 }
 
@@ -43,22 +47,27 @@ function CreateNewInput(InputIDNum) {
     var InputWrap = jQuery("<div id=\"user_inp_"+InputID+"\" class=\"column\"></div>");
     $("#subrow"+InputID).append(InputWrap);
     for (var i = 0; i < Word.length; ++i) {
-        var Input = jQuery("<input autocorrect=\"off\" autocapitalize=\"none\" class=\"inputs\" maxlength=\"1\" id=\"i"+InputID+i.toString()+"\" placeholder=\""+Word.charAt(i)+"\"style=\"font-size:20px; font-weight: bold; margin-right: 10px; width: 4ch; height: 4ch; text-align: center; float:left;\" type=\"text\" />");
+        var Input = jQuery("<input autocorrect=\"off\" autocapitalize=\"none\" class=\"inputs\" maxlength=\"1\" id=\"i"+InputID+i.toString()+"\" style=\"font-size:24px; font-weight: bold; margin-right: 10px; width: 5ch; height: 5ch; text-align: center; float:left;\" type=\"text\" />");
         $("#user_inp_"+InputID).append(Input);
     }
-    
-    $(".inputs").keydown(function( event ) {
-        if (event.keyCode >= 65 && event.keyCode <= 90) {
-            $(this).val(event.key.toLowerCase());
-        }
-        if (event.keyCode == 8) {
-            $(this).val('');
-            $(this).prev('.inputs').focus();
-        }
-    });
 
     // Autotab to next input.
-    $(".inputs").keyup(function () {
+    $(".inputs").keyup(function (event) {
+        if (event.keyCode >= 65 && event.keyCode <= 90) {
+            $(this).val(event.key.toLowerCase());
+            if (!WordCharSet.has($(this).val())) {
+                $(this).css("background-color", 'rgb(239, 203, 104, 0.35)');
+
+            } else {
+                $(this).css("background-color", 'rgb(112, 169, 161, 0.35)');
+            }
+
+        }
+        if (event.keyCode == 8) {
+            $(this).css("background-color", 'transparent');
+            $(this).val('');
+            $(this).prev('.inputs').focus();
+        }        
         if (this.value.length == this.maxLength) {
           var $next = $(this).next('.inputs');
           if ($next.length)
@@ -106,7 +115,7 @@ $( window ).on("load", function() {
 
         for (var i = 0; i < Word.length; i++) {
             WordCharSet.add(Word.charAt(i));
-            var Input = jQuery("<input id=\"l"+i.toString()+"\" value=\""+Word.charAt(i)+"\"style=\"font-size:20px; font-weight: bold; margin-right: 10px; width: 4ch; height: 4ch; text-align: center; float:left;\" type=\"text\" />");
+            var Input = jQuery("<input id=\"l"+i.toString()+"\" value=\""+Word.charAt(i)+"\"style=\"font-size:24px; font-weight: bold; margin-right: 10px; width: 5ch; height: 5ch; text-align: center; float:left;\" type=\"text\" />");
             $("#reference").append(Input)
             $("#l"+i.toString()).prop('disabled', true);
         }
