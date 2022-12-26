@@ -70,6 +70,9 @@ def get_word_freq():
         score = r.json()[0]["timeseries"][0]
         valid = True
 
+    if not valid:
+        return {"valid" : valid}
+
     newchars = int(request.form.get('newchars'))
 
     score = -10*math.log10(score)
