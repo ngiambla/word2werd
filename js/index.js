@@ -3,6 +3,7 @@ var Word;
 const Submissions = new Set();
 const WordCharSet = new Set();
 
+
 function DisableInput(InputIDNum) {
     for (var i = 0; i < Word.length; i++) {
         $("#i"+InputIDNum.toString()+i.toString()).prop('disabled', true);
@@ -56,7 +57,6 @@ function CreateNewInput(InputIDNum) {
 
     // Autotab to next input.
     $(".inputs").keyup(function (event) {
-        console.log($(this));
         if (event.keyCode >= 65 && event.keyCode <= 90) {
             $(this).val(event.key.toLowerCase());
             AnimateInput(Submissions.size);
@@ -118,6 +118,24 @@ function getHiScore() {
 }
 
 $( window ).on("load", function() {
+
+    const TippyMenu = ['howtoplay', 'scoring', 'example']
+    for (const Idx in TippyMenu) {
+        const ID = TippyMenu[Idx];
+        const template = document.getElementById(ID+"-div");
+        template.style.display = 'block';        
+        tippy('#'+ID, {
+          content: template,
+          allowHTML: true,
+          animation: "fade",
+          arrow: true,
+          trigger: "click",
+          theme: "light",
+          interactive: true,
+          placement: "bottom"
+        });
+    }
+
     getHiScore();
     $.post("https://word2werd.pythonanywhere.com/get_word_of_the_day", {}, function(Resp) {
         Word = Resp["word-of-the-day"]
@@ -170,7 +188,6 @@ function validate() {
     
     if (Submissions.size > 2) {
         // TODO: Hit Max.
-        console.log("Here...");
         Toastify({
             text: "You've already submitted 3 words :O!",
             duration: 2000,

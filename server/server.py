@@ -77,8 +77,10 @@ def get_word_freq():
     if not valid:
         return {"valid" : valid}
 
-    newchars = int(request.form.get('newchars'))
+    # Avoid Zero.
+    score = max(score, 1e-20)
 
+    newchars = int(request.form.get('newchars'))
     score = -10*math.log10(score)
     if newchars > 0:
         score *= (1.0/(2*newchars))
