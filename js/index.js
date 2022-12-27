@@ -82,10 +82,10 @@ function getHiScore() {
             var HiScore = Resp["hiscore"]
             $('#hiscore').text(HiScore.toFixed(2));
             $('#hiscore-wrap').show();
-            if(Submissions.size > 2 && $("#word-def").val() != Resp["word"]) {
+            if(Submissions.size > 2 && $("#word-def").text() != Resp["word"]) {
                 $("#hiscore-def").hide();
                 $("#hiscore-def").empty();
-                var Word = jQuery("<h1 id=\"word-def\">Best Scoring Word: <em>"+Resp["word"]+"</em></h1>");
+                var Word = jQuery("<h1>Best Scoring Word: <em id=\"word-def\">"+Resp["word"]+"</em></h1>");
                 $("#hiscore-def").append(Word);
 
                 try {
