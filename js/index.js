@@ -11,10 +11,13 @@ function DisableInput(InputIDNum) {
 
 function AnimateInput(InputIDNum) {
     for (var i = 0; i < Word.length; i++) {
-        if (!WordCharSet.has($("#i"+InputIDNum.toString()+i.toString()).val())) {
-            $("#i"+InputIDNum.toString()+i.toString()).css("background-color", 'rgb(239, 203, 104, 0.35)');
+        var ElRef = "#i"+InputIDNum.toString()+i.toString();
+        if (!$(ElRef).val())
+            continue;
+        if (!WordCharSet.has($(ElRef).val())) {
+            $(ElRef).css("background-color", 'rgb(239, 203, 104, 0.35)');
         } else {
-            $("#i"+InputIDNum.toString()+i.toString()).css("background-color", 'rgb(112, 169, 161, 0.35)');
+            $(ElRef).css("background-color", 'rgb(112, 169, 161, 0.35)');
         }
     }
 }
@@ -53,22 +56,17 @@ function CreateNewInput(InputIDNum) {
 
     // Autotab to next input.
     $(".inputs").keyup(function (event) {
+        console.log($(this));
         if (event.keyCode >= 65 && event.keyCode <= 90) {
             $(this).val(event.key.toLowerCase());
-            if (!WordCharSet.has($(this).val())) {
-                $(this).css("background-color", 'rgb(239, 203, 104, 0.35)');
-
-            } else {
-                $(this).css("background-color", 'rgb(112, 169, 161, 0.35)');
-            }
-
+            AnimateInput(Submissions.size);
         }
+        
         if (event.keyCode == 8) {
             $(this).css("background-color", 'transparent');
             $(this).val('');
             $(this).prev('.inputs').focus();
-        }        
-        if (this.value.length == this.maxLength) {
+        } else if (this.value.length == this.maxLength) {
           var $next = $(this).next('.inputs');
           if ($next.length)
               $(this).next('.inputs').focus();
@@ -79,7 +77,7 @@ function CreateNewInput(InputIDNum) {
 }
 
 function getHiScore() {
-    $.post("https://word2werd.pythonanywhere.com/get_current_topscoring_word", {}, function(Resp) {
+    $.post("https://word2werd.pythonanywhere.com/get_current_topscoring_word", {}, function(Resp) {    
         if (Resp["valid"]) {
             var HiScore = Resp["hiscore"]
             $('#hiscore').text(HiScore.toFixed(2));
@@ -88,14 +86,25 @@ function getHiScore() {
                 $("#hiscore-def").hide();
                 $("#hiscore-def").empty();
                 var Word = jQuery("<h1 id=\"word-def\">Best Scoring Word: <em>"+Resp["word"]+"</em></h1>");
-
                 $("#hiscore-def").append(Word);
-                var Definition = Resp["word"];
-                for (const Prop in Resp["definition"]) {
-                    for (const Def in Resp["definition"][Prop]) {
-                        var DefP = jQuery("<p><em>"+Prop+"</em>: "+Resp["definition"][Prop][Def]+"</p>");
-                        $("#hiscore-def").append(DefP);
-                    }
+
+                try {
+                    $.get("https://api.dictionaryapi.dev/api/v2/entries/en/"+Resp["word"], function(GetResp){
+                        var AllMeanings = GetResp[0]["meanings"];
+                        var DefCount = 0;
+                        for (const Meaning in AllMeanings) {
+                            for (const Definitions in AllMeanings[Meaning]["definitions"]) {
+                                var Def = AllMeanings[Meaning]["definitions"][Definitions]["definition"]
+                                var DefP = jQuery("<p><em>"+AllMeanings[Meaning]["partOfSpeech"]+"</em>: "+Def+"</p>");
+                                $("#hiscore-def").append(DefP);   
+                                DefCount +=1;
+                                if (DefCount > 4)
+                                    break;
+                            }
+                        }
+                    });
+                } catch(e) {
+                    // Do Nothing here.
                 }
                 $("#hiscore-def").show();
             }
