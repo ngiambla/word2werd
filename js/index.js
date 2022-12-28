@@ -60,20 +60,15 @@ function generateNewInput(InputIDNum) {
         $("#user_inp_"+InputID).append(Input);
     }
 
-    $(".inputs").on('input', function(event){
+    $(".inputs").keyup(function (event) {
         if (event.keyCode >= 65 && event.keyCode <= 90) {
             $(this).val(event.key);
             animateInput(Submissions.size);
         } else {
             $(this).val("");
-        }   
-    });
-
-    $(".inputs").keyup(function (event) {
-        if (event.keyCode >= 65 && event.keyCode <= 90) {
-            $(this).val(event.key);
             animateInput(Submissions.size);
         }
+
         if (event.keyCode == 8) {
             $(this).css("background-color", 'transparent');
             $(this).val('');
