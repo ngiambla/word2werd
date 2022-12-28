@@ -62,13 +62,10 @@ function generateNewInput(InputIDNum) {
 
     $(".inputs").keyup(function (event) {
         if (event.keyCode >= 65 && event.keyCode <= 90) {
-            $(this).val(event.key);
-            animateInput(Submissions.size);
-        } else {
-            $(this).val("");
-            animateInput(Submissions.size);
+            $(this).val(event.key.toLowerCase());
+            AnimateInput(Submissions.size);
         }
-
+        
         if (event.keyCode == 8) {
             $(this).css("background-color", 'transparent');
             $(this).val('');
