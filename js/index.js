@@ -4,17 +4,20 @@ const Submissions = new Set();
 const WordCharSet = new Set();
 
 
-function DisableInput(InputIDNum) {
+function disableInput(InputIDNum) {
     for (var i = 0; i < Word.length; i++) {
         $("#i"+InputIDNum.toString()+i.toString()).prop('disabled', true);
     }
 }
 
-function AnimateInput(InputIDNum) {
+function animateInput(InputIDNum) {
     for (var i = 0; i < Word.length; i++) {
         var ElRef = "#i"+InputIDNum.toString()+i.toString();
-        if (!$(ElRef).val())
+        if (!$(ElRef).val()) {
+            $(this).css("background-color", 'transparent');
             continue;
+        }
+
         if (!WordCharSet.has($(ElRef).val())) {
             $(ElRef).css("background-color", 'rgb(239, 203, 104, 0.35)');
         } else {
@@ -23,19 +26,21 @@ function AnimateInput(InputIDNum) {
     }
 }
 
-function ClearInput(InputIDNum) {
+function clearInput(InputIDNum) {
     for (var i = 0; i < Word.length; i++) {
-        $("#i"+InputIDNum.toString()+i.toString()).val('');
+        var ElRef = "#i"+InputIDNum.toString()+i.toString(); 
+        $(ElRef).val('');
+        $(ElRef).css("background-color", 'transparent');
     }
 }
 
-function SetInput(InputIDNum, UserWord) {
+function setInput(InputIDNum, UserWord) {
     for (var i = 0; i < Word.length; i++) {
         $("#i"+InputIDNum.toString()+i.toString()).val(UserWord.charAt(i));
     }
 }
 
-function TagScore(InputIDNum, Score, HiScore) { 
+function tagScore(InputIDNum, Score, HiScore) { 
     var Input = jQuery("<h2>Score: <em id=\"score\"> "+ Score.toFixed(2) +" </em></h2>");
     $("#user_inp_"+InputIDNum.toString()).append(Input);
     if (HiScore !== null) {
@@ -44,7 +49,7 @@ function TagScore(InputIDNum, Score, HiScore) {
     }
 }
 
-function CreateNewInput(InputIDNum) {
+function generateNewInput(InputIDNum) {
     var InputID = InputIDNum.toString();
     $("<div id=\"subrow"+InputID+"\"class=\"row\"></div>").insertBefore("#submit-row");
 
@@ -55,13 +60,20 @@ function CreateNewInput(InputIDNum) {
         $("#user_inp_"+InputID).append(Input);
     }
 
-    // Autotab to next input.
+    $(".inputs").on('input', function(event){
+        if (event.keyCode >= 65 && event.keyCode <= 90) {
+            $(this).val(event.key);
+            animateInput(Submissions.size);
+        } else {
+            $(this).val("");
+        }   
+    });
+
     $(".inputs").keyup(function (event) {
         if (event.keyCode >= 65 && event.keyCode <= 90) {
-            $(this).val(event.key.toLowerCase());
-            AnimateInput(Submissions.size);
+            $(this).val(event.key);
+            animateInput(Submissions.size);
         }
-        
         if (event.keyCode == 8) {
             $(this).css("background-color", 'transparent');
             $(this).val('');
@@ -73,7 +85,7 @@ function CreateNewInput(InputIDNum) {
           else
               $(this).blur();
         }
-    });     
+    });
 }
 
 function getHiScore() {
@@ -85,8 +97,8 @@ function getHiScore() {
             if(Submissions.size > 2 && $("#word-def").text() != Resp["word"]) {
                 $("#hiscore-def").hide();
                 $("#hiscore-def").empty();
-                var Word = jQuery("<h1>Best Scoring Word: <em id=\"word-def\">"+Resp["word"]+"</em></h1>");
-                $("#hiscore-def").append(Word);
+                var TopWord = jQuery("<h1>Best Scoring Word: <em id=\"word-def\">"+Resp["word"]+"</em></h1>");
+                $("#hiscore-def").append(TopWord);
 
                 try {
                     $.get("https://api.dictionaryapi.dev/api/v2/entries/en/"+Resp["word"], function(GetResp){
@@ -111,7 +123,7 @@ function getHiScore() {
         }
 
     }).done(function(){
-        setTimeout(getHiScore, 2000);
+        setTimeout(getHiScore, 3000);
     }).fail(function() {
         console.log("Error: POST failed. Contact nicholas.giamblanco@gmail.com");
     });    
@@ -157,22 +169,38 @@ $( window ).on("load", function() {
                 for(var i = 0; i < NumSubmissions; ++i) {
                     var Score = parseFloat(localStorage.getItem("Score"+i.toString()));
                     var UserWord = localStorage.getItem("Submission"+i.toString());
-                    CreateNewInput(i);
-                    SetInput(i, UserWord)
-                    TagScore(i, Score, null);
-                    DisableInput(i);
-                    AnimateInput(i);
+                    generateNewInput(i);
+                    setInput(i, UserWord)
+                    tagScore(i, Score, null);
+                    disableInput(i);
+                    animateInput(i);
                     Submissions.add(UserWord);
                 }
             }
         }
         if (Submissions.size < 3) {
-            CreateNewInput(Submissions.size);
+            generateNewInput(Submissions.size);
         }
     }).fail(function() {
         console.log("Error: POST failed. Contact nicholas.giamblanco@gmail.com");
     });
 });
+
+function indicateInvalid(UserWord) {
+    clearInput(Submissions.size);
+    Toastify({
+        text: UserWord+" is not a valid word!",
+        duration: 2000,
+        close: true,
+        gravity: "top", // `top` or `bottom`
+        position: "center", // `left`, `center` or `right`
+        stopOnFocus: true, // Prevents dismissing of toast on hover
+        style: {
+          background: "linear-gradient(to right, #00b09b, #96c93d)",
+        },
+        onClick: function(){} // Callback after click
+      }).showToast();        
+}
 
 function validate() {
 
@@ -185,7 +213,7 @@ function validate() {
             NewChars+=1;
         UserWord += UserChar;
     }
-    
+
     if (Submissions.size > 2) {
         // TODO: Hit Max.
         Toastify({
@@ -205,7 +233,7 @@ function validate() {
 
     if (UserWord.length != Word.length) {
         return;
-    }    
+    }
 
     if (UserWord != Word && !Submissions.has(UserWord)) {
         $.post("https://word2werd.pythonanywhere.com/get_word_freq", {"word": UserWord, "newchars" : NewChars}, function(Resp) {
@@ -213,10 +241,9 @@ function validate() {
             var HiScore = Resp["hiscore"]
 
             if (Resp["valid"]) {
-
-                TagScore(Submissions.size, Score, HiScore);
-                DisableInput(Submissions.size);
-                AnimateInput(Submissions.size);
+                tagScore(Submissions.size, Score, HiScore);
+                disableInput(Submissions.size);
+                animateInput(Submissions.size);
                 // Add this to storage.
                 localStorage.setItem('Submission'+Submissions.size.toString(), UserWord);
                 localStorage.setItem('Score'+Submissions.size.toString(), Score);
@@ -224,33 +251,23 @@ function validate() {
                 localStorage.setItem('NumSubmissions', Submissions.size);
 
                 if (Submissions.size < 3) {
-                    CreateNewInput(Submissions.size);
+                    generateNewInput(Submissions.size);
                 }
             } else {
-                ClearInput(Submissions.size);
-                Toastify({
-                    text: UserWord+" is not a valid word!",
-                    duration: 2000,
-                    close: true,
-                    gravity: "top", // `top` or `bottom`
-                    position: "center", // `left`, `center` or `right`
-                    stopOnFocus: true, // Prevents dismissing of toast on hover
-                    style: {
-                      background: "linear-gradient(to right, #00b09b, #96c93d)",
-                    },
-                    onClick: function(){} // Callback after click
-                  }).showToast();                
+                indicateInvalid(UserWord);              
             }
 
         }).fail(function() {
             console.log("Error: POST failed. Contact nicholas.giamblanco@gmail.com");
         }); 
+    
     } else {
-        ClearInput(Submissions.size);
+        clearInput(Submissions.size);
         var Message = "You've already submitted this word!";
         if (UserWord == Word) {
             Message = "You cannot submit the word of the day!";
-        } 
+        }
+
         Toastify({
             text: Message,
             duration: 2000,

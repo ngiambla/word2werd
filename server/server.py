@@ -31,6 +31,9 @@ def get_random_word():
         r = RandomWords()
         while True:
             word = r.get_random_word()
+            resp = requests.head("https://en.wiktionary.org/wiki/"+word)
+            if not resp.ok:
+                continue
             if len(word) >= 5 and len(word) <=7:
                 db[date] = word
                 break
@@ -59,6 +62,10 @@ def get_current_topscoring_word():
 def get_word_freq():
 
     word = request.form.get('word')
+    r = requests.head("https://en.wiktionary.org/wiki/"+word)
+    if not r.ok:
+        return {"valid" : False}
+
     # sending get request and saving the response as response object
     URL="https://books.google.com/ngrams/json?content="+word+"&year_start=2018&year_end=2019&corpus=26"
     r = requests.get(url = URL)
@@ -72,13 +79,11 @@ def get_word_freq():
     valid = False
     if r.status_code == 200 and r.json():
         score = r.json()[0]["timeseries"][0]
-        valid = True
+        if score > 0.0:
+            valid = True
 
     if not valid:
-        return {"valid" : valid}
-
-    # Avoid Zero.
-    score = max(score, 1e-20)
+        return {"valid" : False}
 
     newchars = int(request.form.get('newchars'))
     score = -10*math.log10(score)
