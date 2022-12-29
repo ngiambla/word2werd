@@ -14,10 +14,9 @@ function animateInput(InputIDNum) {
     for (var i = 0; i < Word.length; i++) {
         var ElRef = "#i"+InputIDNum.toString()+i.toString();
         if (!$(ElRef).val()) {
-            $(this).css("background-color", 'transparent');
+            $(ElRef).css("background-color", 'transparent');
             continue;
         }
-
         if (!WordCharSet.has($(ElRef).val())) {
             $(ElRef).css("background-color", 'rgb(239, 203, 104, 0.35)');
         } else {
@@ -58,26 +57,48 @@ function generateNewInput(InputIDNum) {
     for (var i = 0; i < Word.length; ++i) {
         var Input = jQuery("<input autocorrect=\"off\" autocapitalize=\"none\" class=\"inputs\" maxlength=\"1\" id=\"i"+InputID+i.toString()+"\" style=\"font-size:24px; font-weight: bold; margin-right: 10px; width: 5ch; height: 5ch; text-align: center; float:left;\" type=\"text\" />");
         $("#user_inp_"+InputID).append(Input);
-    }
+        $("#i"+InputID+i.toString()).keydown(function (event) {
+            const currentCode = event.which || event.code;
+            let currentKey = event.key;
+            if (!currentKey) {
+              currentKey = String.fromCharCode(currentCode);
+            }
+            const CharCode = currentKey.charCodeAt(0);
+            if (CharCode > 96 && CharCode < 123) {
+                // allow letters 'a' to 'z'
+                $(this).val(event.key);
+            } else if (CharCode == 66) {
+                // Erase this char if backspace is pressed.
+                $(this).val('');
+                $(this).prev('.inputs').focus();
+            } else {
+                // Otherwise, do not allow submission of the input.
+                $(this).val('');
+            }
+            animateInput(Submissions.size);
+            event.preventDefault();
+        });  
 
-    $(".inputs").keyup(function (event) {
-        if (event.keyCode >= 65 && event.keyCode <= 90) {
-            $(this).val(event.key.toLowerCase());
-            AnimateInput(Submissions.size);
-        }
-        
-        if (event.keyCode == 8) {
-            $(this).css("background-color", 'transparent');
-            $(this).val('');
-            $(this).prev('.inputs').focus();
-        } else if (this.value.length == this.maxLength) {
-          var $next = $(this).next('.inputs');
-          if ($next.length)
-              $(this).next('.inputs').focus();
-          else
-              $(this).blur();
-        }
-    });
+        $("#i"+InputID+i.toString()).keyup(function (event) {
+            const currentCode = event.which || event.code;
+            let currentKey = event.key;
+            if (!currentKey) {
+              currentKey = String.fromCharCode(currentCode);
+            }
+            const CharCode = currentKey.charCodeAt(0);        
+            if (this.value.length == this.maxLength && CharCode != 66) {
+              var $next = $(this).next('.inputs');
+              if ($next.length)
+                  $(this).next('.inputs').focus();
+              else
+                  $(this).blur();
+            }
+        });        
+    }
+    
+
+
+
 }
 
 function getHiScore() {
