@@ -523,20 +523,14 @@
 }
 
 .cmd-button {
-    background-color: #9b4dca !important;
-    color: white !important;
-}
-
-.cmd-button:hover {
-    background-color: #606c76 !important;
-    color: white !important;
+    color: #9b4dca;
 }
 
 .input-letter-box {
-    font-size:28px; 
+    font-size:26px; 
     font-weight: bold; 
-    margin-left: 3px; 
-    margin-right: 3px; 
+    margin-left: 2.5px; 
+    margin-right: 2.5px; 
     width: 3ch !important; 
     height: 3ch !important; 
     text-align: center; 

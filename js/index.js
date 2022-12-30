@@ -46,6 +46,7 @@ function setInput(InputIDNum, UserWord) {
 function tagScore(UserWord, Score, HiScore) {
     if (Score > YourBestScore) {
         YourBestScore = Score
+
         $("#your-best-score").text(YourBestScore.toFixed(2));
         $("#your-best-word").text(UserWord);
         $("#your-stats").show();
@@ -73,8 +74,7 @@ function onKeyDown(buttonVal) {
     } else if (buttonVal == "{bksp}") {
         // If we are backspacing, then we should make sure
         // it's a legal index.
-        if (InputIdx > 0)
-        InputIdx--;
+        if (InputIdx > 0) InputIdx--;
     } else {
         InVal = buttonVal;
     }
