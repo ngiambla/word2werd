@@ -1,5 +1,7 @@
 
 var Word;
+var YourBestScore = 0.0;
+var YourBestWord = '';
 var InputIdx = 0;
 var InputIdxLocked = false;
 const Submissions = new Set();
@@ -41,12 +43,17 @@ function setInput(InputIDNum, UserWord) {
     }
 }
 
-function tagScore(InputIDNum, Score, HiScore) { 
-    var Input = jQuery("<h2>Score: <em id=\"score\"> "+ Score.toFixed(2) +" </em></h2>");
-    $("#user_inp_"+InputIDNum.toString()).append(Input);
+function tagScore(UserWord, Score, HiScore) {
+    if (Score > YourBestScore) {
+        YourBestScore = Score
+        $("#your-best-score").text(YourBestScore.toFixed(2));
+        $("#your-best-word").text(UserWord);
+        $("#your-stats").show();
+    }
+
     if (HiScore !== null) {
-        $('#hiscore').text(HiScore.toFixed(2));
-        $('#hiscore-wrap').show();
+        $('#best-score').text(HiScore.toFixed(2));
+        $('#best-score-wrap').show();
     }
 }
 
@@ -59,7 +66,11 @@ function onKeyDown(buttonVal) {
 
     // Default InVal to be a reset.
     var InVal = '';
-    if (buttonVal == "{bksp}") {
+    if (buttonVal == "{submit}") {
+        validate();
+        InputIdxLocked = false;
+        return;
+    } else if (buttonVal == "{bksp}") {
         // If we are backspacing, then we should make sure
         // it's a legal index.
         if (InputIdx > 0)
@@ -83,7 +94,7 @@ function generateNewInput(InputIDNum) {
     var InputWrap = jQuery("<div id=\"user_inp_"+InputID+"\" class=\"column\"></div>");
     $("#subrow"+InputID).append(InputWrap);
     for (var i = 0; i < Word.length; ++i) {
-        var Input = jQuery("<input autocorrect=\"off\" disabled autocapitalize=\"none\" class=\"inputs\" maxlength=\"1\" id=\"i"+InputID+i.toString()+"\" style=\"font-size:24px; font-weight: bold; margin-right: 10px; width: 5ch; height: 5ch; text-align: center; float:left;\" type=\"text\" />");
+        var Input = jQuery("<input autocorrect=\"off\" disabled autocapitalize=\"none\" maxlength=\"1\" id=\"i"+InputID+i.toString()+"\" class=\"input-letter-box\" type=\"text\" />");
         $("#user_inp_"+InputID).append(Input);
     }
     // Reset Keyboard's InputIdx
@@ -94,12 +105,12 @@ function getHiScore() {
     $.post("https://word2werd.pythonanywhere.com/get_current_topscoring_word", {}, function(Resp) {    
         if (Resp["valid"]) {
             var HiScore = Resp["hiscore"]
-            $('#hiscore').text(HiScore.toFixed(2));
-            $('#hiscore-wrap').show();
+            $('#best-score').text(HiScore.toFixed(2));
+            $('#best-score-wrap').show();            
             if(Submissions.size > 2 && $("#word-def").text() != Resp["word"]) {
                 $("#hiscore-def").hide();
                 $("#hiscore-def").empty();
-                var TopWord = jQuery("<h1>Best Scoring Word: <em id=\"word-def\">"+Resp["word"]+"</em></h1>");
+                var TopWord = jQuery("<h3>Best Scoring Word: <em id=\"word-def\">"+Resp["word"]+"</em></h3>");
                 $("#hiscore-def").append(TopWord);
 
                 try {
@@ -140,10 +151,22 @@ $( window ).on("load", function() {
         'default': [
             'q w e r t y u i o p',
             'a s d f g h j k l',
-            '{bksp} z x c v b n m'
+            '{bksp} z x c v b n m {submit}'
           ]
-      }
+      },
+      display: {
+        '{bksp}' : 'DEL',
+        '{submit}': 'SUBMIT'
+      },
+      theme: "hg-theme-default keyboard-default",
+      buttonTheme: [
+        {
+          class: "cmd-button",
+          buttons: "{bksp} {submit}"
+        }
+      ]      
     });
+
 
     const TippyMenu = ['howtoplay', 'scoring', 'example']
     for (const Idx in TippyMenu) {
@@ -168,7 +191,7 @@ $( window ).on("load", function() {
 
         for (var i = 0; i < Word.length; i++) {
             WordCharSet.add(Word.charAt(i));
-            var Input = jQuery("<input id=\"l"+i.toString()+"\" value=\""+Word.charAt(i)+"\"style=\"font-size:24px; font-weight: bold; margin-right: 10px; width: 5ch; height: 5ch; text-align: center; float:left;\" type=\"text\" />");
+            var Input = jQuery("<input id=\"l"+i.toString()+"\" value=\""+Word.charAt(i)+"\" class=\"input-letter-box\" type=\"text\" />");
             $("#reference").append(Input)
             $("#l"+i.toString()).prop('disabled', true);
         }
@@ -185,7 +208,7 @@ $( window ).on("load", function() {
                     var UserWord = localStorage.getItem("Submission"+i.toString());
                     generateNewInput(i);
                     setInput(i, UserWord)
-                    tagScore(i, Score, null);
+                    tagScore(UserWord, Score, null);
                     disableInput(i);
                     animateInput(i);
                     Submissions.add(UserWord);
@@ -256,7 +279,7 @@ function validate() {
             var HiScore = Resp["hiscore"]
 
             if (Resp["valid"]) {
-                tagScore(Submissions.size, Score, HiScore);
+                tagScore(UserWord, Score, HiScore);
                 disableInput(Submissions.size);
                 animateInput(Submissions.size);
                 // Add this to storage.

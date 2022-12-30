@@ -2,6 +2,8 @@
 <html>
 
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
 <!-- Fonts Includes -->
     <!-- Google Fonts -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic"/>
@@ -17,6 +19,8 @@
     <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/themes/light.css"/>
     <!-- Simple Keyboard -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simple-keyboard@latest/build/css/index.css">
+    <!-- Index -->
+    <link rel="stylesheet" href="css/index.css"/>
 
 <!-- Javascript Includes -->
     <!-- JQuery -->
@@ -28,7 +32,6 @@
     <script src="https://unpkg.com/tippy.js@6"></script>
     <!-- Simple Keyboard -->
     <script src="https://cdn.jsdelivr.net/npm/simple-keyboard@latest/build/index.js"></script>
-
     <!-- Index -->
     <script type="text/javascript" src="js/index.js"></script>
 
@@ -36,87 +39,120 @@
 </head>
 
 <body>
-    <div class="container">
-        <h1>Word2<code>Werd</code></h1>
+    <main class="wrapper">
+        <section class="container">
+            <h1 class="title">Word2<code>Werd</code></h1>
 
-        <div class="row" style="margin-left: 0; margin-top: 10px; margin-bottom: 10px;">
-            <a id="howtoplay" class="button" style="margin-right: 10px;">How To Play!</a>
-            <a id="scoring" class="button" style="margin-right: 10px;">Scoring</a>
-            <a id="example" class="button" style="margin-right: 10px;">Example</a>
-        </div>
+            <div class="row" style="margin-left: 0; margin-top: 10px; margin-bottom: 10px;">
+                <a id="howtoplay" class="button menu-button"> How To Play! </a>
+                <a id="scoring" class="button menu-button"> Scoring </a>
+                <a id="example" class="button menu-button"> Example </a>
+            </div>
+
+            <div id="howtoplay-div" style="display: none;">
+                <blockquote>
+                    <p><em>If you replace the % and # in **%*#** with ^ and >, then you can form a new word, **^*>**</em></p>
+                </blockquote>
+                <p> If this sounds like something you've encountered before, now there's a game with for it.
+                    Here are the rules:
+                </p>
+                <ol>
+                    <li>You are provided with a word.</li>
+                    <li>You are to form a new word of the same size (same number of characters as the provided word)</li>
+                    <li>You can use any characters of the English alphabet to form the new word</li>
+                    <li>The new word cannot be the provided word!</li>
+                    <li>You get three trys per day! </li>
+                </ol>
+            </div>
+            <div id="scoring-div" style="display: none;">
+                <h2><em>Scoring:</em></h2>
+                <ul>
+                    <li>Less frequently used words in modern english provide a higher score (i.e., <code>grapple</code> is higher in value than <code>through</code>)<sup>1</sup> </li>
+                    <li>Try to reuse the characters from the provided word. Every <em>new</em> character in your new word halves your score!</li>
+                </ul>
+            </div>
+            <div id="example-div" style="display: none;">
+                <h2><em>Example Play: <code>tiger</code></em></h2>
+                <ul>
+                    <li>We could form any new five letter word, such as <code>wasps</code>
+                        <ul>
+                            <li>However, this word did not use <em>any</em> of the letters of the provided word.</li>
+                            <li>Therefore, each new letter would halve it's score.</li>
+                        </ul>
+                    </li>
         
-        <div id="howtoplay-div" style="display: none;">
-            <blockquote>
-                <p><em>If you replace the % and # in **%*#** with ^ and >, then you can form a new word, **^*>**</em></p>
-            </blockquote>
-            <p> If this sounds like something you've encountered before, now there's a game with for it.
-                Here are the rules:
-            </p>
-            <ol>
-                <li>You are provided with a word.</li>
-                <li>You are to form a new word of the same size (same number of characters as the provided word)</li>
-                <li>You can use any characters of the English alphabet to form the new word</li>
-                <li>The new word cannot be the provided word!</li>
-                <li>You get three trys per day! </li>
-            </ol>
-        </div>
-        <div id="scoring-div" style="display: none;">
-            <h2><em>Scoring:</em></h2>
-            <ul>
-                <li>Less frequently used words in modern english provide a higher score (i.e., <code>grapple</code> is higher in value than <code>through</code>)<sup>1</sup> </li>
-                <li>Try to reuse the characters from the provided word. Every <em>new</em> character in your new word halves your score!</li>
-            </ul>
-        </div>
-        <div id="example-div" style="display: none;">
-            <h2><em>Example Play: <code>tiger</code></em></h2>
-            <ul>
-                <li>We could form any new five letter word, such as <code>wasps</code>
-                    <ul>
-                        <li>However, this word did not use <em>any</em> of the letters of the provided word.</li>
-                        <li>Therefore, each new letter would halve it's score.</li>
-                    </ul>
-                </li>
+                    <li>A better choice may be <code>gator</code>
+                        <ul>
+                            <li>Here, we reused the letters <code>t, g, r</code></li>
+                            <li>Even though we reused more letters, this word is frequently used in modern english, so it's score won't be high</li>
+                        </ul>
+                    </li>
+                    <li>An even better choice may be <code>greet</code>
+                        <ul>
+                            <li>Here, we reused the letters <code>g, e, r</code></li>
+                            <li>Since we didn't introduce any new characters, our score won't be halved!</li>
+                            <li>This word is less frequently used in modern english, so our score will be higher!</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
     
-                <li>A better choice may be <code>gator</code>
-                    <ul>
-                        <li>Here, we reused the letters <code>t, g, r</code></li>
-                        <li>Even though we reused more letters, this word is frequently used in modern english, so it's score won't be high</li>
-                    </ul>
-                </li>
-                <li>An even better choice may be <code>greet</code>
-                    <ul>
-                        <li>Here, we reused the letters <code>g, e, r</code></li>
-                        <li>Since we didn't introduce any new characters, our score won't be halved!</li>
-                        <li>This word is less frequently used in modern english, so our score will be higher!</li>
-                    </ul>
-                </li>
-            </ul>
-        </div>
+            <div class="row">
+                <div id="reference" class="column"> </div>
+            </div>
 
-        <div class="row">
-            <div id="reference"  class="column"> </div>
-        </div>
-        <div id ="submit-row" class="row" style="margin-left: 0px; margin-bottom: 20px; align-items: center;">
-            <a onclick="validate()" style="align-self: center;" id="check_resp" class="button">Submit.</a>
-        </div>
-        <div class="row" style="margin-bottom: 40px;">
-            <div class="column column-50">
-                <div class="simple-keyboard"></div>
+            <div id ="submit-row" class="row">
             </div>
-        </div>
-        <div class="row">
-            <div id="stats"  class="column column-50">
-                <h2 id="hiscore-wrap" style="display: none;">Current Hi-Score: <em id="hiscore">0</em></h2>
+
+            <div class="row" style="margin-bottom: 25px;">
+                <div class="column">
+                    <div class="simple-keyboard"></div>
+                </div>
             </div>
-        </div>
-        <div class="row">
-            <div id="hiscore-def" class="column column-50" style="display: none;"></div>
-        </div>
+
+            <div class="row">
+                <div id="stats"  class="column">
+                    <table>
+                        <thead>
+                          <tr>
+                            <th>Today's Stats</th>
+                            <th></th>
+                            <th></th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr id="your-stats" style="display:none;">
+                            <td>Your Best Score</td>
+                            <td id="your-best-score"></td>
+                            <td id="your-best-word"></td>
+                          </tr>
+                          <tr>
+                            <td></td>
+                            <td></td>
+                          </tr>                          
+                          <tr id="best-score-wrap" style="display: none;">
+                            <td>Hi Score</td>
+                            <td id="best-score"></td>
+                          </tr>
+                        </tbody>
+                      </table>
+                </div>
+            </div>
+
+            <div class="row">
+                <div id="hiscore-def" class="column" style="display: none;"></div>
+            </div>
     
-        <blockquote>
-            <sup>1</sup> Frequency taken from Google's N-Grams. 
-            Scoring takes the frequency from Google's N-Gram Viewer, and computes the log (Base 10) of this frequency. The result is then multiplied by -10.
-        </blockquote>
-    </div>
+            <div class="row">
+                <div class="column">
+                    <blockquote>
+                        <sup>1</sup> Frequency taken from Google's N-Grams. 
+                        Scoring takes the frequency from Google's N-Gram Viewer, and computes the log (Base 10) of this frequency. The result is then multiplied by -10.
+                    </blockquote>
+                </div>
+            </div>
+        </section>
+    </main>
+    
 </body>
 </html>
