@@ -1,5 +1,7 @@
 
 var Word;
+var InputIdx = 0;
+var InputIdxLocked = false;
 const Submissions = new Set();
 const WordCharSet = new Set();
 
@@ -48,6 +50,32 @@ function tagScore(InputIDNum, Score, HiScore) {
     }
 }
 
+function onKeyDown(buttonVal) {
+    // Check if we can proceed with KeyDown.
+    if (InputIdxLocked)
+        return;
+    // Lock Mutex on KeyDown
+    InputIdxLocked = true;
+
+    // Default InVal to be a reset.
+    var InVal = '';
+    if (buttonVal == "{bksp}") {
+        // If we are backspacing, then we should make sure
+        // it's a legal index.
+        if (InputIdx > 0)
+        InputIdx--;
+    } else {
+        InVal = buttonVal;
+    }
+    var ElRef = "#i"+Submissions.size.toString()+InputIdx.toString();
+    $(ElRef).val(InVal);
+    if (buttonVal != "{bksp}") {
+        if (InputIdx < Word.length) InputIdx++;
+    }
+    animateInput(Submissions.size);
+    InputIdxLocked = false;
+}
+
 function generateNewInput(InputIDNum) {
     var InputID = InputIDNum.toString();
     $("<div id=\"subrow"+InputID+"\"class=\"row\"></div>").insertBefore("#submit-row");
@@ -55,50 +83,11 @@ function generateNewInput(InputIDNum) {
     var InputWrap = jQuery("<div id=\"user_inp_"+InputID+"\" class=\"column\"></div>");
     $("#subrow"+InputID).append(InputWrap);
     for (var i = 0; i < Word.length; ++i) {
-        var Input = jQuery("<input autocorrect=\"off\" autocapitalize=\"none\" class=\"inputs\" maxlength=\"1\" id=\"i"+InputID+i.toString()+"\" style=\"font-size:24px; font-weight: bold; margin-right: 10px; width: 5ch; height: 5ch; text-align: center; float:left;\" type=\"text\" />");
+        var Input = jQuery("<input autocorrect=\"off\" disabled autocapitalize=\"none\" class=\"inputs\" maxlength=\"1\" id=\"i"+InputID+i.toString()+"\" style=\"font-size:24px; font-weight: bold; margin-right: 10px; width: 5ch; height: 5ch; text-align: center; float:left;\" type=\"text\" />");
         $("#user_inp_"+InputID).append(Input);
-        $("#i"+InputID+i.toString()).keydown(function (event) {
-            const currentCode = event.which || event.code;
-            let currentKey = event.key;
-            if (!currentKey) {
-              currentKey = String.fromCharCode(currentCode);
-            }
-            const CharCode = currentKey.charCodeAt(0);
-            if (CharCode > 96 && CharCode < 123) {
-                // allow letters 'a' to 'z'
-                $(this).val(event.key);
-            } else if (CharCode == 66) {
-                // Erase this char if backspace is pressed.
-                $(this).val('');
-                $(this).prev('.inputs').focus();
-            } else {
-                // Otherwise, do not allow submission of the input.
-                $(this).val('');
-            }
-            animateInput(Submissions.size);
-            event.preventDefault();
-        });  
-
-        $("#i"+InputID+i.toString()).keyup(function (event) {
-            const currentCode = event.which || event.code;
-            let currentKey = event.key;
-            if (!currentKey) {
-              currentKey = String.fromCharCode(currentCode);
-            }
-            const CharCode = currentKey.charCodeAt(0);        
-            if (this.value.length == this.maxLength && CharCode != 66) {
-              var $next = $(this).next('.inputs');
-              if ($next.length)
-                  $(this).next('.inputs').focus();
-              else
-                  $(this).blur();
-            }
-        });        
     }
-    
-
-
-
+    // Reset Keyboard's InputIdx
+    InputIdx = 0;
 }
 
 function getHiScore() {
@@ -121,7 +110,7 @@ function getHiScore() {
                             for (const Definitions in AllMeanings[Meaning]["definitions"]) {
                                 var Def = AllMeanings[Meaning]["definitions"][Definitions]["definition"]
                                 var DefP = jQuery("<p><em>"+AllMeanings[Meaning]["partOfSpeech"]+"</em>: "+Def+"</p>");
-                                $("#hiscore-def").append(DefP);   
+                                $("#hiscore-def").append(DefP);
                                 DefCount +=1;
                                 if (DefCount > 4)
                                     break;
@@ -134,7 +123,6 @@ function getHiScore() {
                 $("#hiscore-def").show();
             }
         }
-
     }).done(function(){
         setTimeout(getHiScore, 3000);
     }).fail(function() {
@@ -143,6 +131,19 @@ function getHiScore() {
 }
 
 $( window ).on("load", function() {
+
+    const Keyboard = window.SimpleKeyboard.default;
+    const myKeyboard = new Keyboard({
+      onKeyPress: button => onKeyDown(button),
+      disableButtonHold: false,
+      layout: {
+        'default': [
+            'q w e r t y u i o p',
+            'a s d f g h j k l',
+            '{bksp} z x c v b n m'
+          ]
+      }
+    });
 
     const TippyMenu = ['howtoplay', 'scoring', 'example']
     for (const Idx in TippyMenu) {
@@ -201,6 +202,8 @@ $( window ).on("load", function() {
 
 function indicateInvalid(UserWord) {
     clearInput(Submissions.size);
+    // Reset Keyboard's InputIdx
+    InputIdx = 0;
     Toastify({
         text: UserWord+" is not a valid word!",
         duration: 2000,
@@ -216,7 +219,6 @@ function indicateInvalid(UserWord) {
 }
 
 function validate() {
-
     var UserWord = "";
     var NewChars = 0;
     var SubID = Submissions.size.toString()
