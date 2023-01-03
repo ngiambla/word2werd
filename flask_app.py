@@ -38,8 +38,10 @@ def get_current_topscoring_word():
 def get_word_freq():
     word = request.form.get('word')
     newchars = int(request.form.get('newchars'))
+    if newchars < 0:
+        return {"valid" : False}
     score_info = w2wcore().score_submission(word, newchars)
     if score_info is None:
-        return {"valid" : False}    
+        return {"valid" : False}
     score_info["valid"] = True
     return score_info

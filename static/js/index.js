@@ -110,9 +110,9 @@ function onKeyDown(buttonVal) {
 
 function generateNewInput(InputIDNum) {
     var InputID = InputIDNum.toString();
-    $("<div id=\"subrow"+InputID+"\"class=\"row\"></div>").insertBefore("#submit-row");
+    $("<div id=\"subrow"+InputID+"\"class=\"row center-parent\"></div>").insertBefore("#submit-row");
 
-    var InputWrap = jQuery("<div id=\"user_inp_"+InputID+"\" class=\"column\"></div>");
+    var InputWrap = jQuery("<div id=\"user_inp_"+InputID+"\" class=\"column center-child\"></div>");
     $("#subrow"+InputID).append(InputWrap);
     for (var i = 0; i < Word.length; ++i) {
         var Input = jQuery("<input autocorrect=\"off\" disabled autocapitalize=\"none\" maxlength=\"1\" id=\"i"+InputID+i.toString()+"\" class=\"input-letter-box\" type=\"text\" />");

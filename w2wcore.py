@@ -104,8 +104,8 @@ class W2WCore:
             return None
         
         score = -10*math.log10(score)
-        if num_newchars > 0:
-            score *= (1.0/(2*num_newchars))
+        if num_newchars < 6:
+            score *= (1.0-0.1*num_newchars)
 
         date = self.__get_date()
         results = self.__db.query("SELECT date_time FROM submissions WHERE date_time = ?", [date])

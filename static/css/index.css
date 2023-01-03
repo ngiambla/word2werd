@@ -315,11 +315,13 @@
     display: block;
     height: 2.2rem;
     text-align: center;
-    width: 5rem
+    width: 5rem;
+    padding: 2px;
 }
 
 .share-dialog:hover {
-    background-color: #606c76
+    background-color: #606c76;
+    color: #fff;
 }
 
 .share-dialog .share-icon {
@@ -515,9 +517,36 @@
 
 /* This is Word2Werd Specific Content! */
 .menu-button {
-    margin-right: 10px;
-    margin-left: 10px;
+    margin-right: 5px;
+    margin-left: 5px;
+    margin-top: 10px;
+    display: block;
 }
+
+@media(min-width:43rem) {
+    .menu-button {
+        margin-right: 10px;
+        margin-left: 10px;
+        display: block;
+    }
+}
+
+.menu-left {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+@media(min-width:40rem) {
+    .menu-button {
+        display: inline-block;
+    }
+
+    .menu-left {
+        margin-left: auto;
+        margin-right: 0;
+    }
+}
+
 
 .keyboard-default {
     font-family: 'Roboto', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif !important;
@@ -527,6 +556,17 @@
 
 .cmd-button {
     color: #9b4dca;
+}
+
+
+.center-parent {
+    align-items: center;
+    justify-content: center;
+}
+
+.center-child {
+    width: unset !important;
+    flex: inherit !important;
 }
 
 .input-letter-box {
@@ -540,7 +580,7 @@
     float:left;
 }
 
-@media(min-width:80rem) {
+@media(min-width:40rem) {
     .input-letter-box {
         font-size:26px; 
         font-weight: bold; 
