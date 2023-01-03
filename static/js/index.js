@@ -7,10 +7,11 @@ var InputIdxLocked = false;
 const Submissions = new Set();
 const WordCharSet = new Set();
 
-
 function disableInput(InputIDNum) {
     for (var i = 0; i < Word.length; i++) {
-        $("#i"+InputIDNum.toString()+i.toString()).prop('disabled', true);
+        var ElRef = "#i"+InputIDNum.toString()+i.toString();
+        $(ElRef).prop('disabled', true);
+        $(ElRef).css('border-color', 'black');
     }
 }
 
@@ -44,12 +45,20 @@ function setInput(InputIDNum, UserWord) {
 }
 
 function tagScore(UserWord, Score, HiScore) {
-    if (Score > YourBestScore) {
-        YourBestScore = Score
 
-        $("#your-best-score").text(YourBestScore.toFixed(2));
-        $("#your-best-word").text(UserWord);
-        $("#your-stats").show();
+
+    var statRow = jQuery("<tr id=\""+UserWord+"\"><td>"+UserWord+"</td><td>"+Score.toFixed(2)+"</td><td></td></tr>");
+    statRow.insertBefore("#stat-separator");
+
+    if (Score > YourBestScore) {
+        // $("#hi-score-marker").remove();
+        if (YourBestWord.length > 0)
+            $("#"+YourBestWord).children().last().text("");
+        YourBestScore = Score;
+        YourBestWord = UserWord;
+        $("#"+UserWord).children().last().text("Personal Best!");
+        // var hiScoreMarker = jQuery("<td id=\"hi-score-marker\">Your Best Score!</td>");
+        // $("#"+YourBestWord).append(hiScoreMarker)
     }
 
     if (HiScore !== null) {
@@ -102,7 +111,7 @@ function generateNewInput(InputIDNum) {
 }
 
 function getHiScore() {
-    $.post("https://word2werd.pythonanywhere.com/get_current_topscoring_word", {}, function(Resp) {    
+    $.post("/get_current_topscoring_word", {}, function(Resp) {    
         if (Resp["valid"]) {
             var HiScore = Resp["hiscore"]
             $('#best-score').text(HiScore.toFixed(2));
@@ -142,7 +151,6 @@ function getHiScore() {
 }
 
 $( window ).on("load", function() {
-
     const Keyboard = window.SimpleKeyboard.default;
     const myKeyboard = new Keyboard({
       onKeyPress: button => onKeyDown(button),
@@ -167,7 +175,6 @@ $( window ).on("load", function() {
       ]      
     });
 
-
     const TippyMenu = ['howtoplay', 'scoring', 'example']
     for (const Idx in TippyMenu) {
         const ID = TippyMenu[Idx];
@@ -186,7 +193,7 @@ $( window ).on("load", function() {
     }
 
     getHiScore();
-    $.post("https://word2werd.pythonanywhere.com/get_word_of_the_day", {}, function(Resp) {
+    $.post("/get_word_of_the_day", {}, function(Resp) {
         Word = Resp["word-of-the-day"]
 
         for (var i = 0; i < Word.length; i++) {
@@ -274,7 +281,7 @@ function validate() {
     }
 
     if (UserWord != Word && !Submissions.has(UserWord)) {
-        $.post("https://word2werd.pythonanywhere.com/get_word_freq", {"word": UserWord, "newchars" : NewChars}, function(Resp) {
+        $.post("/get_word_freq", {"word": UserWord, "newchars" : NewChars}, function(Resp) {
             var Score = Resp["score"]
             var HiScore = Resp["hiscore"]
 
