@@ -19,6 +19,8 @@
     <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/themes/light.css"/>
     <!-- Simple Keyboard -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simple-keyboard@latest/build/css/index.css">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <!-- Index -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}"/>
 
@@ -39,12 +41,14 @@
 <body>
     <main class="wrapper">
         <section class="container">
-            <h1 class="title">Word2<code>Werd</code></h1>
 
             <div class="row" style="margin-left: 0; margin-top: 10px; margin-bottom: 10px;">
-                <a id="howtoplay" class="button menu-button"> How To Play! </a>
-                <a id="scoring" class="button menu-button"> Scoring </a>
-                <a id="example" class="button menu-button"> Example </a>
+                <h1 class="title">Word2<code>Werd</code></h1>
+                <div class="menu-left">
+                    <a id="howtoplay" class="button menu-button"> How To Play! </a>
+                    <a id="scoring" class="button menu-button"> Scoring </a>
+                    <a id="example" class="button menu-button"> Example </a>
+                </div>
             </div>
 
             <div id="howtoplay-div" style="display: none;">
@@ -59,14 +63,16 @@
                     <li>You are to form a new word of the same size (same number of characters as the provided word)</li>
                     <li>You can use any characters of the English alphabet to form the new word</li>
                     <li>The new word cannot be the provided word!</li>
-                    <li>You get three trys per day! </li>
+                    <li>You get three trys per day, a new word is generated everyday at 00:00 UTC!</li>
                 </ol>
+                <p>
+                    Try to reuse the characters from the provided word. Every <em>new</em> character in your new word reduces your score by <b>10%</b> (up to a max of <b>50%</b>)!
+                </p>
             </div>
             <div id="scoring-div" style="display: none;">
                 <h2><em>Scoring:</em></h2>
                 <ul>
                     <li>Less frequently used words in modern english provide a higher score (i.e., <code>grapple</code> is higher in value than <code>through</code>)<sup>1</sup> </li>
-                    <li>Try to reuse the characters from the provided word. Every <em>new</em> character in your new word halves your score!</li>
                 </ul>
                 <p> Scores are computed via Google's N-Gram Viewer, which finds the frequency of occurence of a submitted word. The frequency (generally <em>very, very</em> small) is then mapped to a logarithmic scale (Base 10), and multiplied by -10.
                     For those non-mathy individuals reading this: this is only to provide a score that is <em>somewhat</em> comprehensible and comparable to others. If you want to <em>cheat</em> you could look up the word using the N-Gram viewer, and find
@@ -78,7 +84,7 @@
                     <li>We could form any new five letter word, such as <code>wasps</code>
                         <ul>
                             <li>However, this word did not use <em>any</em> of the letters of the provided word.</li>
-                            <li>Therefore, each new letter would halve its score.</li>
+                            <li>Therefore, each new letter would decrease its score by 10% (until we hit 50%, or 5 new letters).</li>
                         </ul>
                     </li>
         
@@ -86,20 +92,21 @@
                         <ul>
                             <li>Here, we reused the letters <code>t, g, r</code></li>
                             <li>Even though we reused more letters, this word is frequently used in modern english, so it's score won't be high</li>
+                            <li>Additionally, two new characters were use, <code>a, o</code> which decreases the score by 20%!</li>
                         </ul>
                     </li>
                     <li>An even better choice may be <code>greet</code>
                         <ul>
                             <li>Here, we reused the letters <code>g, e, r</code></li>
-                            <li>Since we didn't introduce any new characters, our score won't be halved!</li>
+                            <li>Since we didn't introduce any new characters, our score won't decrease!</li>
                             <li>This word is less frequently used in modern english, so our score will be higher!</li>
                         </ul>
                     </li>
                 </ul>
             </div>
     
-            <div class="row">
-                <div id="reference" class="column"> </div>
+            <div class="row center-parent">
+                <div id="reference" class="column center-child"> </div>
             </div>
 
             <div id ="submit-row" class="row">
@@ -127,7 +134,7 @@
                             <td></td>
                           </tr>                          
                           <tr id="best-score-wrap" style="display: none;">
-                            <td>Hi Score</td>
+                            <td>Today's Best Score</td>
                             <td id="best-score"></td>
                           </tr>
                         </tbody>
@@ -147,6 +154,29 @@
                     </blockquote>
                 </div>
             </div>
+
+            <div class="share">
+                Share this!
+                <ul class="share-list">
+                    <li class="share-item">
+                        <a class="share-dialog fa fa-github" href="https://github.com/ngiambla/word2werd" title="Share word2werd on Github" target="_blank" rel="noopener">
+                        </a>
+                    </li>
+                    <li class="share-item">
+                        <a class="share-dialog fa fa-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https://github.com/ngiambla/word2werd" title="Share word2werd on Facebook" target="_blank" rel="noopener">
+                        </a>
+                    </li>
+                    <li class="share-item">
+                        <a class="share-dialog fa fa-twitter" href="https://twitter.com/intent/tweet?text=word2werd&amp;url=https://github.com/ngiambla/word2werd title="Share word2werd on Twitter" target="_blank" rel="noopener">
+                        </a>
+                    </li>
+                    <li class="share-item">
+                        <a class="share-dialog fa fa-reddit" href="https://www.reddit.com/submit?url=https://github.com/ngiambla/word2werd&amp;title=word2werd" title="Share word2werd on Reddit" target="_blank" rel="noopener">
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
         </section>
     </main>
     
