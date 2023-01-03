@@ -1,4 +1,6 @@
-
+'''
+server.py: A Flask Backend for Word2Werd.
+'''
 from flask import Flask, request, render_template, g
 
 import requests
@@ -32,7 +34,6 @@ def get_current_topscoring_word():
     score_info["valid"] = True
     return score_info
 
-
 @app.route('/get_word_freq', methods=['POST'])
 def get_word_freq():
     word = request.form.get('word')
@@ -40,6 +41,5 @@ def get_word_freq():
     score_info = w2wcore().score_submission(word, newchars)
     if score_info is None:
         return {"valid" : False}    
-
     score_info["valid"] = True
     return score_info

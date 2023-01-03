@@ -51,14 +51,11 @@ function tagScore(UserWord, Score, HiScore) {
     statRow.insertBefore("#stat-separator");
 
     if (Score > YourBestScore) {
-        // $("#hi-score-marker").remove();
         if (YourBestWord.length > 0)
             $("#"+YourBestWord).children().last().text("");
         YourBestScore = Score;
         YourBestWord = UserWord;
         $("#"+UserWord).children().last().text("Personal Best!");
-        // var hiScoreMarker = jQuery("<td id=\"hi-score-marker\">Your Best Score!</td>");
-        // $("#"+YourBestWord).append(hiScoreMarker)
     }
 
     if (HiScore !== null) {
@@ -121,25 +118,22 @@ function getHiScore() {
                 $("#hiscore-def").empty();
                 var TopWord = jQuery("<h3>Best Scoring Word: <em id=\"word-def\">"+Resp["word"]+"</em></h3>");
                 $("#hiscore-def").append(TopWord);
-
-                try {
-                    $.get("https://api.dictionaryapi.dev/api/v2/entries/en/"+Resp["word"], function(GetResp){
-                        var AllMeanings = GetResp[0]["meanings"];
-                        var DefCount = 0;
-                        for (const Meaning in AllMeanings) {
-                            for (const Definitions in AllMeanings[Meaning]["definitions"]) {
-                                var Def = AllMeanings[Meaning]["definitions"][Definitions]["definition"]
-                                var DefP = jQuery("<p><em>"+AllMeanings[Meaning]["partOfSpeech"]+"</em>: "+Def+"</p>");
-                                $("#hiscore-def").append(DefP);
-                                DefCount +=1;
-                                if (DefCount > 4)
-                                    break;
-                            }
+                $.get("https://api.dictionaryapi.dev/api/v2/entries/en/"+Resp["word"], function(GetResp){
+                    var AllMeanings = GetResp[0]["meanings"];
+                    var DefCount = 0;
+                    for (const Meaning in AllMeanings) {
+                        for (const Definitions in AllMeanings[Meaning]["definitions"]) {
+                            var Def = AllMeanings[Meaning]["definitions"][Definitions]["definition"]
+                            var DefP = jQuery("<p><em>"+AllMeanings[Meaning]["partOfSpeech"]+"</em>: "+Def+"</p>");
+                            $("#hiscore-def").append(DefP);
+                            DefCount +=1;
+                            if (DefCount > 4)
+                                break;
                         }
-                    });
-                } catch(e) {
-                    // Do Nothing here.
-                }
+                    }
+                }).fail(function() {
+                    console.log("Error: POST failed. Contact nicholas.giamblanco@gmail.com");
+                });
                 $("#hiscore-def").show();
             }
         }
@@ -147,7 +141,7 @@ function getHiScore() {
         setTimeout(getHiScore, 3000);
     }).fail(function() {
         console.log("Error: POST failed. Contact nicholas.giamblanco@gmail.com");
-    });    
+    });
 }
 
 $( window ).on("load", function() {

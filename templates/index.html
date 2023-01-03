@@ -68,6 +68,9 @@
                     <li>Less frequently used words in modern english provide a higher score (i.e., <code>grapple</code> is higher in value than <code>through</code>)<sup>1</sup> </li>
                     <li>Try to reuse the characters from the provided word. Every <em>new</em> character in your new word halves your score!</li>
                 </ul>
+                <p> Scores are computed via Google's N-Gram Viewer, which finds the frequency of occurence of a submitted word. The frequency (generally <em>very, very</em> small) is then mapped to a logarithmic scale (Base 10), and multiplied by -10.
+                    For those non-mathy individuals reading this: this is only to provide a score that is <em>somewhat</em> comprehensible and comparable to others. If you want to <em>cheat</em> you could look up the word using the N-Gram viewer, and find
+                    out if the frequency of the word is <em>super</em> small... :)</p>
             </div>
             <div id="example-div" style="display: none;">
                 <h2><em>Example Play: <code>tiger</code></em></h2>
@@ -75,7 +78,7 @@
                     <li>We could form any new five letter word, such as <code>wasps</code>
                         <ul>
                             <li>However, this word did not use <em>any</em> of the letters of the provided word.</li>
-                            <li>Therefore, each new letter would halve it's score.</li>
+                            <li>Therefore, each new letter would halve its score.</li>
                         </ul>
                     </li>
         
