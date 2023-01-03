@@ -12,7 +12,7 @@ to make this into an actual game for her (and our friends/family and maybe YOU t
 
 # Where to Play
 
-Head [here](ngiambla.pythonanywhere.com)!
+Head [here](https://ngiambla.pythonanywhere.com)!
 
 # Rules
 * You are provided with a word.

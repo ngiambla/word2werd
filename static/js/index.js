@@ -7,6 +7,21 @@ var InputIdxLocked = false;
 const Submissions = new Set();
 const WordCharSet = new Set();
 
+function toast(Message) {
+    Toastify({
+        text: Message,
+        duration: 2000,
+        close: true,
+        gravity: "top", // `top` or `bottom`
+        position: "center", // `left`, `center` or `right`
+        stopOnFocus: true, // Prevents dismissing of toast on hover
+        style: {
+          background: "linear-gradient(to right, #00b09b, #96c93d)",
+        },
+        onClick: function(){} // Callback after click
+    }).showToast();
+}
+
 function disableInput(InputIDNum) {
     for (var i = 0; i < Word.length; i++) {
         var ElRef = "#i"+InputIDNum.toString()+i.toString();
@@ -228,18 +243,7 @@ function indicateInvalid(UserWord) {
     clearInput(Submissions.size);
     // Reset Keyboard's InputIdx
     InputIdx = 0;
-    Toastify({
-        text: UserWord+" is not a valid word!",
-        duration: 2000,
-        close: true,
-        gravity: "top", // `top` or `bottom`
-        position: "center", // `left`, `center` or `right`
-        stopOnFocus: true, // Prevents dismissing of toast on hover
-        style: {
-          background: "linear-gradient(to right, #00b09b, #96c93d)",
-        },
-        onClick: function(){} // Callback after click
-      }).showToast();        
+    toast(UserWord+" is not a valid word!");       
 }
 
 function validate() {
@@ -254,19 +258,7 @@ function validate() {
     }
 
     if (Submissions.size > 2) {
-        // TODO: Hit Max.
-        Toastify({
-            text: "You've already submitted 3 words :O!",
-            duration: 2000,
-            close: true,
-            gravity: "top", // `top` or `bottom`
-            position: "center", // `left`, `center` or `right`
-            stopOnFocus: true, // Prevents dismissing of toast on hover
-            style: {
-              background: "linear-gradient(to right, #00b09b, #96c93d)",
-            },
-            onClick: function(){} // Callback after click
-          }).showToast();
+        toast("You've already submitted 3 words :O!");
         return;
     }
 
@@ -301,23 +293,6 @@ function validate() {
         }); 
     
     } else {
-        clearInput(Submissions.size);
-        var Message = "You've already submitted this word!";
-        if (UserWord == Word) {
-            Message = "You cannot submit the word of the day!";
-        }
-
-        Toastify({
-            text: Message,
-            duration: 2000,
-            close: true,
-            gravity: "top", // `top` or `bottom`
-            position: "center", // `left`, `center` or `right`
-            stopOnFocus: true, // Prevents dismissing of toast on hover
-            style: {
-              background: "linear-gradient(to right, #00b09b, #96c93d)",
-            },
-            onClick: function(){} // Callback after click
-          }).showToast();
+        indicateInvalid(UserWord);
     }
 }
