@@ -23,11 +23,11 @@ Head [here](https://ngiambla.pythonanywhere.com)!
 
 # Scoring
 1. Less frequently used words in modern english provide a higher score (i.e., `grapple` is higher in value than `through`).
-2. Try to reuse the characters from the provided word. Every _new_ character in your new word decreases your score by 10% (up to a max of 50%)!
+2. Try to reuse the characters from the provided word. Every _new_ character _used_ in your new word decreases your score by $\frac{1}{\text{wordlen}}$.
 
 Scores are computed by asking [Google's N-Gram Viewer](https://books.google.com/ngrams/) for the frequency of occurence of the word
 you submitted. The frequency (which is generally _very, very_ small) is then mapped to a logarithmic scale (Base 10), and multiplied by -10.
-For those non-mathy individuals reading this: this is only to provide a score that is _somewhat_ comprehensible and comparable to others.
+For those non-mathy individuals reading this: this is only to provide a score that is _somewhat_ comprehendible and comparable to others.
 Therefore, after scaling, the range of scores are from [0, +INF)! If you want to "cheat" you could look up the word using the N-Gram viewer, and find
 out if the frequency of the word is _very_ small... :)
 
