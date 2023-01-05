@@ -66,7 +66,7 @@
                     <li>You get three trys per day, a new word is generated everyday at 00:00 UTC!</li>
                 </ol>
                 <p>
-                    Try to reuse the characters from the provided word. Every <em>new</em> character in your new word reduces your score by <b>10%</b> (up to a max of <b>50%</b>)!
+                    Try to reuse the characters from the provided word. Every <em>new</em> character <em>used</em> in your new word reduces your score by <b><sup>1</sup>&frasl;<sub>wordlen</sub></b>.
                 </p>
             </div>
             <div id="scoring-div" style="display: none;">
@@ -75,7 +75,7 @@
                     <li>Less frequently used words in modern english provide a higher score (i.e., <code>grapple</code> is higher in value than <code>through</code>)<sup>1</sup> </li>
                 </ul>
                 <p> Scores are computed via Google's N-Gram Viewer, which finds the frequency of occurence of a submitted word. The frequency (generally <em>very, very</em> small) is then mapped to a logarithmic scale (Base 10), and multiplied by -10.
-                    For those non-mathy individuals reading this: this is only to provide a score that is <em>somewhat</em> comprehensible and comparable to others. If you want to <em>cheat</em> you could look up the word using the N-Gram viewer, and find
+                    For those non-mathy individuals reading this: this is only to provide a score that is <em>somewhat</em> comprehendible and comparable to others. If you want to <em>cheat</em> you could look up the word using the N-Gram viewer, and find
                     out if the frequency of the word is <em>super</em> small... :)</p>
             </div>
             <div id="example-div" style="display: none;">
@@ -84,7 +84,8 @@
                     <li>We could form any new five letter word, such as <code>wasps</code>
                         <ul>
                             <li>However, this word did not use <em>any</em> of the letters of the provided word.</li>
-                            <li>Therefore, each new letter would decrease its score by 10% (until we hit 50%, or 5 new letters).</li>
+                            <li>Therefore, each new letter (and it's uses) would decrease its score by 20% (i.e., <sup>1</sup>&frasl;<sub>5</sub>).</li>
+                            <li>In the end, <code>wasps</code> would achieve a score of 0.</li>
                         </ul>
                     </li>
         
@@ -92,7 +93,7 @@
                         <ul>
                             <li>Here, we reused the letters <code>t, g, r</code></li>
                             <li>Even though we reused more letters, this word is frequently used in modern english, so it's score won't be high</li>
-                            <li>Additionally, two new characters were use, <code>a, o</code> which decreases the score by 20%!</li>
+                            <li>Additionally, two new characters were use, <code>a, o</code> which decreases the score by 40%!</li>
                         </ul>
                     </li>
                     <li>An even better choice may be <code>greet</code>
@@ -145,15 +146,6 @@
             <div class="row">
                 <div id="hiscore-def" class="column" style="display: none;"></div>
             </div>
-    
-            <div class="row">
-                <div class="column">
-                    <blockquote>
-                        <sup>1</sup> Frequency taken from Google's N-Grams. 
-                        Scoring takes the frequency from Google's N-Gram Viewer, and computes the log (Base 10) of this frequency. The result is then multiplied by -10.
-                    </blockquote>
-                </div>
-            </div>
 
             <div class="share">
                 Share this!
@@ -167,7 +159,7 @@
                         </a>
                     </li>
                     <li class="share-item">
-                        <a class="share-dialog fa fa-twitter" href="https://twitter.com/intent/tweet?text=word2werd&amp;url=https://github.com/ngiambla/word2werd title="Share word2werd on Twitter" target="_blank" rel="noopener">
+                        <a class="share-dialog fa fa-twitter" href="https://twitter.com/intent/tweet?text=word2werd&amp;url=https://github.com/ngiambla/word2werd" title="Share word2werd on Twitter" target="_blank" rel="noopener">
                         </a>
                     </li>
                     <li class="share-item">

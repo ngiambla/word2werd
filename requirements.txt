@@ -1,4 +1,6 @@
 wiktionaryparser==0.0.97
 Random-Word==1.0.11
 flask==2.1.2
+pyenchant==3.2.2
+better_profanity==0.7.0
 requests

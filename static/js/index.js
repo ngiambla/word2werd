@@ -22,12 +22,24 @@ function toast(Message) {
     }).showToast();
 }
 
+function disableInputI(InputIDNum, i, Len) {
+    if (i == Len)
+        return;
+    var ElRef = "#i"+InputIDNum.toString()+i.toString();
+    $(ElRef).prop('disabled', true);
+    $(ElRef).css('box-shadow', '0px 3px 6px rgba(155, 77, 202, 0.21)').animate({
+    }, 0, function() {
+        $(ElRef).css('border', '2.5px solid #9b4dca').animate({
+            borderWidth: 0
+        }, 130, function() {
+            disableInputI(InputIDNum, i+1, Len);
+        });
+    });
+
+}
+
 function disableInput(InputIDNum) {
-    for (var i = 0; i < Word.length; i++) {
-        var ElRef = "#i"+InputIDNum.toString()+i.toString();
-        $(ElRef).prop('disabled', true);
-        $(ElRef).css('border-color', 'black');
-    }
+    disableInputI(InputIDNum, 0, Word.length);
 }
 
 function animateInput(InputIDNum) {
@@ -60,8 +72,6 @@ function setInput(InputIDNum, UserWord) {
 }
 
 function tagScore(UserWord, Score, HiScore) {
-
-
     var statRow = jQuery("<tr id=\""+UserWord+"\"><td>"+UserWord+"</td><td>"+Score.toFixed(2)+"</td><td></td></tr>");
     statRow.insertBefore("#stat-separator");
 
@@ -79,7 +89,7 @@ function tagScore(UserWord, Score, HiScore) {
     }
 }
 
-function onKeyDown(buttonVal) {
+async function onKeyDown(buttonVal) {
     // Check if we can proceed with KeyDown.
     if (InputIdxLocked)
         return;
@@ -89,7 +99,7 @@ function onKeyDown(buttonVal) {
     // Default InVal to be a reset.
     var InVal = '';
     if (buttonVal == "{submit}") {
-        validate();
+        await validate();
         InputIdxLocked = false;
         return;
     } else if (buttonVal == "{bksp}") {
@@ -163,12 +173,12 @@ $( window ).on("load", function() {
     const Keyboard = window.SimpleKeyboard.default;
     const myKeyboard = new Keyboard({
       onKeyPress: button => onKeyDown(button),
-      disableButtonHold: false,
+      disableButtonHold: true,
       layout: {
         'default': [
             'q w e r t y u i o p',
             'a s d f g h j k l',
-            '{bksp} z x c v b n m {submit}'
+            '{submit} z x c v b n m {bksp}'
           ]
       },
       display: {
@@ -210,6 +220,7 @@ $( window ).on("load", function() {
             var Input = jQuery("<input id=\"l"+i.toString()+"\" value=\""+Word.charAt(i)+"\" class=\"input-letter-box\" type=\"text\" />");
             $("#reference").append(Input)
             $("#l"+i.toString()).prop('disabled', true);
+            $("#l"+i.toString()).css('box-shadow', '0px 3px 6px rgba(155, 77, 202, 0.21)')
         }
         if (localStorage.getItem("WordOfDay") != Word) {
             localStorage.clear();
@@ -246,9 +257,10 @@ function indicateInvalid(UserWord) {
     toast(UserWord+" is not a valid word!");       
 }
 
-function validate() {
+async function validate() {
     var UserWord = "";
     var NewChars = 0;
+
     var SubID = Submissions.size.toString()
     for (var i = 0; i < Word.length; i++) {
         UserChar = $("#i"+SubID+i.toString()).val();

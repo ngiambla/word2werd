@@ -5,7 +5,7 @@ w2wcore.py: Modules and Utilities Required for Word2Werd's Core Game Logic.
 from random_word import RandomWords
 from wiktionaryparser import WiktionaryParser
 from datetime import datetime
-
+from better_profanity import profanity
 
 import sqlite3
 import math
@@ -13,6 +13,7 @@ import json
 import time
 import requests
 import os.path
+import enchant
 
 class DBHandler:
     def __init__(self, db_path = "data/database.db"):
@@ -38,7 +39,6 @@ class W2WCore:
     '''
     def __init__(self):
         # Create a Parser for Wikitionary.
-        self.__parser = WiktionaryParser()
         self.__word_generator = RandomWords()
 
         # sqlite3 database.
@@ -51,13 +51,18 @@ class W2WCore:
         return datetime.today().strftime("%Y-%m-%d")
 
     def __is_word_legal(self, word):
-        word_info = self.__parser.fetch(word)
-        if not word_info or not word_info[0]["definitions"]:
-            # This word does not have a definition on Wiktionary.
+        if not enchant.Dict("en_US").check(word):
+            # This word does is not legal in English.
             return False
+
+        if profanity.contains_profanity(word):
+            # This word is bad :O
+            return False
+
         if len(word) < 5 or len(word) > 7:
             # Choose words between 5 and 7 letters long.
             return False
+
         if not word.isalpha():
             # Ensure the word ONLY contains letters.
             return False
@@ -96,6 +101,8 @@ class W2WCore:
         return None
     
     def score_submission(self, word, num_newchars):
+        assert(num_newchars <= len(word) and num_newchars >= 0)
+
         if not self.__is_word_legal(word):
             return None
         
@@ -104,8 +111,8 @@ class W2WCore:
             return None
         
         score = -10*math.log10(score)
-        if num_newchars < 6:
-            score *= (1.0-0.1*num_newchars)
+        discount = 1.0/len(word)
+        score *= (1.0-discount*num_newchars)
 
         date = self.__get_date()
         results = self.__db.query("SELECT date_time FROM submissions WHERE date_time = ?", [date])
